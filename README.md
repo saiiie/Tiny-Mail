@@ -1,8 +1,8 @@
-# Tiny Post
+# Tiny Mail
 
 ## Description
 
-Tiny Post is a cute 2D delivery game developed using Godot.
+Tiny Mail is a cute 2D delivery game developed using Godot.
 
 The player takes the role of a small mail carrier who travels around a neighborhood and delivers letters to the correct houses.
 
