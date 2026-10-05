@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://cjbw2hvgshmbv"]
+
+[ext_resource type="Texture2D" uid="uid://b7jgurn6h7ybb" path="res://icon.svg" id="1_04atp"]
+[ext_resource type="Script" uid="uid://j7d4uwtdyn15" path="res://delivery_house.gd" id="1_nqhd8"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0xlia"]
+
+[node name="DeliveryHouse" type="Area2D" unique_id=2027782907]
+script = ExtResource("1_nqhd8")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=566489558]
+modulate = Color(0.94417775, 0.85687864, 0.50844866, 1)
+position = Vector2(553, 305)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("1_04atp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1694324965]
+position = Vector2(553.99994, 309.99997)
+scale = Vector2(8, 8)
+shape = SubResource("RectangleShape2D_0xlia")
+
+[node name="Label" type="Label" parent="." unique_id=1466953681]
+visible = false
+offset_left = 484.0
+offset_top = 395.0
+offset_right = 621.0
+offset_bottom = 418.0
+text = "Press E to deliver!"

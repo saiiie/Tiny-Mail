@@ -26,20 +26,16 @@ The player takes the role of a small mail carrier who travels around a neighborh
 
 ## Development Status
 
-Week 1 - Initial Godot project setup and 2D scene.
-
-Currently implemented:
-
-- Godot project setup
+### Week 1
+- Initial Godot project setup
 - Main Node2D scene
-- Player Sprite2D
-- Placeholder player texture
+- Placeholder Player Sprite2D
 - Running 2D scene
 
-## Tools
-
-- Godot Engine 4
-- GDScript
-- Git
-- GitHub
-- Git LFS
+### Week 2
+- CharacterBody2D player controller
+- WASD and arrow-key movement
+- Player collision shape
+- Delivery-area collision detection
+- Interactive delivery using the E key
+- Squash-and-stretch delivery feedback
