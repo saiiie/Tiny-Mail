@@ -1,5 +1,97 @@
 # Tiny Mail
 
+## Week 7 - Juice, Save/Load & Optimization
+
+Implementation is ready for manual review. Profiler capture and the second real peer playtest remain pending. No editor wiring or navigation baking is required.
+
+### Polish
+
+- Puddle and crow impacts trigger a fixed Camera2D shake: at most 2 pixels per axis for 0.14 seconds. Original whole-level framing and the steady HUD are preserved. Camera processing stops when the effect ends.
+- Brief hit-stop uses Engine.time_scale = 0.01 for 0.06 real seconds. GameSession restores the previous scale using a real-time deadline, on scene changes, and on exit. The level also restores it when removed. After 0.08 real seconds the rabbit returns to Start, and the crow resets as before.
+- Delivery Complete! fades in and out using a HUD Tween before the 0.85-second Level 1 transition. Progress Saved is included only when the checkpoint write succeeds. The final completion panel also fades in. Gameplay timing pauses during delivery feedback.
+
+### Save / Load
+
+scenes/ui/save_manager.gd is a small SaveManager autoload with save_game(), load_game(), has_save(), and clear_save(). GameSession handles new-game and Continue routing.
+
+- Format: JSON, version 1.
+- Location: user://tiny_post_save.json (never res://). In Godot, use Project > Open User Data Folder to find it. Default Windows location: %APPDATA%/Godot/app_userdata/Tiny Post/tiny_post_save.json.
+- Data: version, level (the current checkpoint scene), elapsed_seconds (gameplay time at that checkpoint). Save validity is derived by validating the file; it is not a separately trusted Boolean.
+- Autosave: entering either level, completing Level 1 (saves Level 2 before transition), and completing Level 2. Direct F6 level runs also save that level.
+- Start / Play Again clears the old save, resets time, and starts Level 1, creating a fresh checkpoint upon entry.
+- Continue is disabled without a valid save. It restores Level 1 or Level 2 at START with the saved elapsed time. After final completion it replays Level 2 with that saved time; completion itself is not persisted.
+- This is checkpoint persistence: closing mid-level loses time accumulated since the latest checkpoint. Exact positions and temporary states are not saved.
+- Missing, unreadable, malformed, wrong-version, unknown-level, missing-resource, or invalid-timer saves are rejected. Only the two known level paths are accepted. If the save becomes invalid after the menu opens, Continue safely starts a new game.
+
+Example:
+
+```json
+{"version":1,"level":"res://scenes/levels/level_2.tscn","elapsed_seconds":65.0}
+```
+
+### Optimization
+
+**Optimization implemented for profiling review.** In scenes/ui/hud.gd, timer text formatting and Label assignment happen only when the displayed whole second changes, with a cached Label reference. Previously both happened every rendered frame. This reduces unnecessary string creation, node lookup, and label assignment while preserving the display. The Godot Profiler will be used to verify runtime impact; no performance measurements are claimed.
+
+The existing enemy already updates its chase navigation target every 0.15 seconds. That implementation remains unchanged.
+
+### Manual Godot tests
+
+1. Open project.godot in Godot 4.7.2, wait for imports, and press F5. With no save, Continue must be disabled. To test a clean state, stop the game and back up/remove only tiny_post_save.json from Project > Open User Data Folder.
+2. Choose Start. Check Level 1, timer starting at 00:00, four-direction movement/animations, idle, dust, hedge collisions, music, and HUD. A Level 1 JSON checkpoint should now exist.
+3. Touch a puddle. Check a small shake, very brief impact pause, splash audio, reset to START, and normal speed afterward. Try R and Escape during impacts; neither should leave the game slowed down.
+4. Complete Level 1. Check delivery chime, tweened Delivery Complete! / Progress Saved, then Level 2. Inspect the JSON: level must be res://scenes/levels/level_2.tscn with nonnegative elapsed_seconds.
+5. Stop the game entirely (F8), run again (F5), and choose Continue. Check Level 2 at START with the checkpoint timer restored. Repeat closing/Continue with a Level 1 checkpoint.
+6. Check crow PATROL, CHASE, pathfinding around hedges/puddles, contact impact/reset, and return to patrol. Check R retains the timer and Escape opens the menu. Complete Level 2 and check frozen timer, faded-in completion panel, stopped player/enemy/dust, Play Again, and Main Menu.
+7. From a Level 2 save choose Start; confirm fresh Level 1/time and a Level 1 save. Test keyboard focus/Enter on all three menu buttons, Quit, and window resizing.
+8. Stop the game; back up the save. Replace its content with invalid JSON, then run: Continue must be disabled and Start must work. Repeat with the example JSON but level set to res://missing.tscn (and optionally a negative elapsed_seconds). Restore the backup afterward if wanted. Do not edit saves while the game is running.
+9. Visually review shake comfort, HUD readability, tween timing, particle appearance, and audio balance. Headless checks cannot establish these qualities.
+
+### Manual Profiler steps (pending)
+
+1. Press F5 in Godot and Start or Continue. Keep the game running.
+2. Return to the editor and open the bottom Debugger panel, then its Profiler tab (the script Profiler, not Visual Profiler).
+3. Click Start in the Profiler if capture is not already running.
+4. Return to the game and play for roughly 30-60 seconds. Include Level 2 patrol/chase, movement, puddles, and delivery.
+5. Return to the Profiler and stop capture. Inspect Frame Time, process/physics timing, and expand Script Functions. Use milliseconds, inspect a representative frame and a spike, and compare function time and call counts. Self time excludes time spent in callees; Inclusive includes it.
+6. Record the largest obvious measured cost, its function/category, timing, hardware/run conditions, and a screenshot. Do not assume the HUD is the largest cost. Check the HUD update cost; a before/after comparison needs equivalent runs with the earlier timer implementation and this one. If differences are too small to measure reliably, report that.
+
+Reference: [Godot Profiler documentation](https://docs.godotengine.org/en/stable/tutorials/scripting/debug/the_profiler.html).
+
+Profiler observation / largest measured cost:
+[TO BE FILLED AFTER PROFILING]
+
+Runtime impact of optimization:
+[TO BE FILLED AFTER PROFILING]
+
+### Week 7 Peer Playtest
+
+Pending: conduct a real second 5-minute peer playtest. Ask the peer to try Start, impacts, delivery, closing/reopening and Continue, and menu controls. Record actual feedback, implement one resulting improvement, and retest it before marking this requirement complete.
+
+Observation:
+[TO BE FILLED AFTER PLAYTEST]
+
+Improvement made:
+[TO BE FILLED AFTER PLAYTEST]
+
+### Week 7 validation
+
+Run headless checks with Godot on PATH:
+
+```text
+godot --headless --path . --editor --import --quit
+godot --headless --path . --script tools/validate_project.gd
+godot --headless --path . --script tools/validate_week3.gd
+godot --headless --path . --script tools/validate_week4.gd
+godot --headless --path . --script tools/validate_week5.gd
+godot --headless --path . --script tools/validate_week6.gd
+godot --headless --path . --script tools/validate_week7.gd
+```
+
+These suites write checkpoints; back up the save before running and restore it afterward. Week 7 deliberately clears/overwrites it with invalid and valid test data. Earlier regression waits now accommodate impact and delivery feedback delays. Headless checks do not replace visual/gameplay review, profiling, or peer testing.
+
+Validation performed for Week 7 with Godot 4.7.2: headless editor import passed without parser/resource errors; project validation loaded 33 resources with zero failures; Week 3, 4, 5, 6, and 7 integration suites passed with zero failures. A paired --write-checkpoint / --read-checkpoint run of tools/validate_week7.gd in separate Godot processes restored Level 2 and its timer with zero failures. Existing user save contents were preserved around these runs. git diff --check passed. These checks cover movement/animation selection, particle emission flags, hazards, enemy FSM/navigation, audio playback states, HUD/menu flow, checkpoint validation, impact recovery, and tween state. Visual appearance, audible quality, measured profiling impact, and peer feedback remain unverified.
+
 ## Description
 
 Tiny Mail is a cute 2D delivery game developed using Godot.

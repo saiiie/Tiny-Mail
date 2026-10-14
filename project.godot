@@ -17,6 +17,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+SaveManager="*res://scenes/ui/save_manager.gd"
 GameSession="*res://scenes/ui/game_session.tscn"
 
 [display]

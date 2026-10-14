@@ -36,6 +36,7 @@ func run_checks() -> void:
 		for hazard in level.get_node("Hazards").get_children():
 			player.global_position = hazard.global_position
 			await frames()
+			await create_timer(0.12, true, false, true).timeout
 			check(player.global_position.distance_to(level.get_node("Start").global_position) < 1.0, "Puddle failed to reset player")
 		# Walk left from START into the hedge, using unchanged movement input.
 		Input.action_press("move_left")
@@ -44,6 +45,7 @@ func run_checks() -> void:
 		check(player.position.x >= 79.0, "Player passed through hedge")
 		player.global_position = level.get_node("Goal").global_position
 		await frames(10)
+		await create_timer(0.9).timeout
 		if number == 1:
 			check(current_scene.scene_file_path == "res://scenes/levels/level_2.tscn", "Level 1 did not transition")
 		else:

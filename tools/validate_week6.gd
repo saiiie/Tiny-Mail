@@ -86,6 +86,11 @@ func run_checks() -> void:
 	var elapsed_before: float = root.get_node("GameSession").elapsed_seconds
 	player.position = enemy.position
 	await frames(3)
+	# Wait for impact feedback to finish, without adding extra patrol time.
+	for tick in range(30):
+		if not level.resetting:
+			break
+		await frames(1)
 	check(player.position == level.get_node("Start").position, "Enemy contact did not reset Player")
 	check(level.get_node("HUD/%Status").text.contains("crow"), "Enemy reset status missing")
 	check(enemy.position.distance_to(enemy.spawn_position) < 10.0, "Enemy failed to return to safe patrol spawn")

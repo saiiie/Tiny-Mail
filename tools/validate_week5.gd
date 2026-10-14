@@ -68,6 +68,7 @@ func run_checks() -> void:
 	var player: CharacterBody2D = current_scene.get_node("Player")
 	player.position = current_scene.get_node("Hazards/Puddle1").position
 	await frames(3)
+	await create_timer(0.12, true, false, true).timeout
 	check(hazard.playing, "Puddle SFX did not start")
 	check(player.position == current_scene.get_node("Start").position, "Puddle reset failed")
 	var before_restart: float = session.elapsed_seconds
@@ -79,8 +80,9 @@ func run_checks() -> void:
 	player.position = current_scene.get_node("Goal").position
 	var before_goal: float = session.elapsed_seconds
 	await frames()
-	check(current_scene.name == "Level2", "Goal did not load Level 2")
 	check(delivery.playing, "Delivery SFX missing across transition")
+	await create_timer(0.9).timeout
+	check(current_scene.name == "Level2", "Goal did not load Level 2")
 	check(session.elapsed_seconds >= before_goal, "Level transition reset timer")
 	check(music.get_instance_id() == music_id and music.playing, "Music did not persist")
 	check(current_scene.get_node("HUD/%LevelLabel").text == "Level 2 / 2", "Level 2 indicator missing")

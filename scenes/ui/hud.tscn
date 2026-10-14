@@ -35,6 +35,16 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Follow the path to DELIVER HERE. Avoid puddles. No time limit."
+[node name="Feedback" type="Label" parent="."]
+unique_name_in_owner = true
+anchor_right = 1.0
+offset_top = 84.0
+offset_bottom = 126.0
+mouse_filter = 2
+theme = ExtResource("2")
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+modulate = Color(1, 1, 1, 0)
 [node name="Completion" type="Control" parent="."]
 visible = false
 anchors_preset = 15
