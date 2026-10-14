@@ -11,12 +11,14 @@ config_version=5
 [application]
 
 config/name="Tiny Post"
-run/main_scene="uid://b2vyi6r4q5o33"
+run/main_scene="res://scenes/levels/level_1.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [display]
 
+window/size/viewport_width=960
+window/size/viewport_height=704
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
