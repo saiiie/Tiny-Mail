@@ -101,7 +101,7 @@ func build_level(number: int, tiles: TileSet) -> void:
 	else:
 		positions = [Vector2(240,608), Vector2(304,496), Vector2(496,368), Vector2(656,304), Vector2(752,176)]
 	for index in range(positions.size()):
-		var hazard: Area2D = load("res://hazard.tscn").instantiate()
+		var hazard: Area2D = load("res://scenes/objects/hazard.tscn").instantiate()
 		hazard.name = "Puddle%d" % (index + 1)
 		hazard.position = positions[index]
 		attach(hazards, hazard, level)

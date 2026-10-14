@@ -5,6 +5,8 @@ extends CharacterBody2D
 var delivery_target: Area2D = null
 
 @onready var sprite: Sprite2D = $Sprite2D
+@onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var movement_dust: GPUParticles2D = $MovementDust
 var normal_sprite_scale: Vector2
 
 
@@ -27,6 +29,21 @@ func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("deliver") and delivery_target != null:
 		if delivery_target.deliver():
 			play_delivery_animation()
+
+
+# Visuals also update after the level disables physics on completion.
+func _process(_delta: float) -> void:
+	var moving := is_physics_processing() and not velocity.is_zero_approx()
+	var animation: StringName = &"idle"
+	if moving:
+		# Prefer vertical on equal diagonal input; otherwise use the dominant axis.
+		if absf(velocity.y) >= absf(velocity.x):
+			animation = &"move_down" if velocity.y > 0.0 else &"move_up"
+		else:
+			animation = &"move_right" if velocity.x > 0.0 else &"move_left"
+	if animation_player.current_animation != animation:
+		animation_player.play(animation)
+	movement_dust.emitting = moving
 
 
 func set_delivery_target(target: Area2D) -> void:
