@@ -189,3 +189,80 @@ godot --headless --path . --script tools/validate_week5.gd
 The Week 5 suite exercises menu buttons, R/Escape input events, timer updates/persistence/freeze, header bounds, audio playing states/loop configuration/buses, real hazard/goal overlaps, both completion buttons, and Quit. Headless playback-state tests do not establish audible quality, visual appearance, or peer feedback.
 
 Validation performed with Godot 4.7.2: project-aware validation loaded all 26 script/scene/resource files with zero failures; Week 3, Week 4, and Week 5 integration suites each reported zero failures and clean shutdown. The music playback-state check waited through a full 12-second loop. All referenced paths exist, git diff --check passed, and the Player files, TileSet, and saved tile data remain unchanged. The standalone --check-only command does not initialize autoload names, so validate_project.gd performs the full script/resource check in project context. Headless editor import reports only environment-specific user-directory/feature-profile errors. No interactive visual test, listening assessment, or peer playtest has been performed.
+
+## Week 6 - AI & Enemies
+
+One reusable crow placeholder was added to **Level 2 only**. Its colored Polygon2D body, wing, beak, and eye use no downloaded assets. A PATROL/CHASE label makes its current behavior visible. Level 1 remains the easier introduction. The Player files, directional animations, particles, input mappings, TileSet, and saved tile layouts were not changed.
+
+### Enemy scene and FSM
+
+scenes/enemies/enemy.tscn contains a CharacterBody2D, simple polygon visuals, a CircleShape2D body collider, NavigationAgent2D, DetectionArea with a circular collider, ContactArea with a small contact collider, and StateLabel.
+
+The enum-based finite state machine has exactly two states:
+
+- **PATROL:** starts at EnemyPatrolPointA (432, 400), walks to EnemyPatrolPointB (656, 224), then alternates between these two fixed markers. Patrol speed is 70 pixels/second.
+- **CHASE:** DetectionArea body_entered stores the existing Player and switches state. The navigation target follows the Player, refreshed every 0.15 seconds, at 140 pixels/second. DetectionArea body_exited clears that reference and returns to PATROL. Both speeds are slower than the rabbit's unchanged 220 pixels/second.
+
+Detection radius is 112 pixels. Detection is proximity-based, so it can notice a rabbit across a nearby hedge; navigation still takes the walkable route around that hedge. No random wandering, health, combat, attacks, or additional enemy types were added.
+
+### Navigation
+
+Level 2 contains a NavigationRegion2D using the saved resources/level_2_navigation.tres. The polygon is baked from existing Ground path tiles (source ID 1), with all five visible puddles excluded and 12 pixels of clearance for the crow's 10-pixel body radius. The patrol points are on opposite sides of a bend. The crow sets NavigationAgent2D.target_position and moves toward get_next_path_position(), rather than moving directly through obstacles toward the player. It waits for the navigation map's first synchronization before requesting a path.
+
+No manual baking is required. tools/build_week6_navigation.gd can explicitly rebuild only this navigation resource after path/puddle edits:
+
+```text
+godot --headless --path . --script tools/build_week6_navigation.gd
+```
+
+The older tools/build_week3.gd also preserves the enemy/marker/region setup if deliberately used to regenerate levels; it was not run during Week 6. Re-bake navigation after changing generated walkable geometry.
+
+### Contact consequence
+
+Physical body contact or the small ContactArea touching the Player emits player_touched. The level uses the same guarded, deferred reset flow as puddles: teleport the rabbit to the existing Start marker, clear velocity, play the existing reset sound, and show a crow-specific HUD message. There is no loss of health or elapsed time. After either a puddle or crow reset, the crow returns to its original patrol position and clears its chase target, keeping START safe. The crow stops moving/detecting on completion; R recreates one fresh enemy and Escape removes it with the level.
+
+### AI-assisted coding
+
+**AI-drafted with Codex:**
+- Initial enemy FSM structure.
+- Patrol/chase state transitions.
+- NavigationAgent2D movement logic.
+
+**Reviewed/adjusted by Codex for this implementation:**
+- Actual Tiny Post scene/resource paths and the existing week3_player group.
+- Patrol markers on the Level 2 bend.
+- Detection radius (112), patrol speed (70), and chase speed (140).
+- Navigation clearance, map synchronization, puddle exclusions, and chase target refresh timing.
+- Contact/reset integration with the existing Start marker, HUD, timer, sound, and completion flow.
+- Regression compatibility with the existing Tiny Post scenes and saved level generator.
+
+Understanding notes: the state selects the goal and speed; Area2D signals select the state; NavigationAgent2D supplies the next safe path point; move_and_slide applies the movement and body collisions. Resetting is deferred because detection/contact signals occur during physics processing. Comments in enemy.gd explain these responsibilities. These notes describe the implemented code and automated checks, not manual edits, student review, or visual playtesting that has not occurred.
+
+### Validation
+
+With Godot on PATH, run:
+
+```text
+godot --headless --path . --editor --import
+godot --headless --path . --script tools/validate_project.gd
+godot --headless --path . --script tools/validate_week3.gd
+godot --headless --path . --script tools/validate_week4.gd
+godot --headless --path . --script tools/validate_week5.gd
+godot --headless --path . --script tools/validate_week6.gd
+```
+
+The Week 6 suite runs real physics/navigation: it observes a full patrol there and back, checks path points around the bend, verifies movement stays on walkable tiles and clear of puddles, detects Player entry/exit, refreshes a moving chase target, follows a puddle detour, triggers contact reset/audio, stops the enemy on completion, and verifies restart/menu cleanup. Headless checks inspect visible geometry and collision setup, but do not establish actual visual appearance or difficulty balance.
+
+### Manual testing
+
+1. Open project.godot in Godot 4.7.2, allow imports, press F5, and choose Start. Finish Level 1 normally. Confirm its movement, animations, dust, puddles, HUD, music, and transition are unchanged.
+2. In Level 2, wait at START and watch the purple crow on the middle/right bend. Allow about 12 seconds to see it visit both patrol points; its label should say PATROL. For faster testing, open scenes/levels/level_2.tscn and press F6.
+3. Follow the path toward the crow. When nearby, check that its label changes to CHASE and that it follows you using the paths. Move away (the rabbit is faster) until outside detection, then check that the label returns to PATROL.
+4. Lead it near the central puddle and bend; confirm it routes around puddles/hedges rather than cutting through them. Optionally enable Debug > Visible Navigation and Visible Collision Shapes before running to inspect the region and detection/contact shapes.
+5. Touch the crow: confirm the rabbit returns to START, a reset sound plays, the HUD explains the reset, the timer continues, and the crow returns to its patrol start. Touch a puddle and confirm its existing reset still works.
+6. Press R and confirm one enemy starts patrolling again. Press Escape and confirm Main Menu; Start should begin a fresh Level 1 run.
+7. Finish Level 2 while avoiding the crow. Confirm the completion panel, stopped timer/player/enemy, Play Again, and Main Menu buttons still work.
+
+Interactive visual testing and difficulty assessment remain for the user's review. No peer playtest feedback or results have been invented; earlier pending playtest fields are preserved.
+
+Week 6 validation performed with Godot 4.7.2: all 31 project scripts/scenes/resources loaded successfully; Week 3, 4, 5, and 6 integration suites each reported 0 failures. The Week 6 test observed two patrol target switches at normal physics timing. No missing resource references were found and git diff --check passed. Player files, project settings/inputs, Level 1, existing UI/session scripts, TileSet, and Level 2 tile data remain unchanged. Headless editor import completed with only the environment-specific user-directory/feature-profile errors already seen in earlier weeks. No interactive visual gameplay test was performed.

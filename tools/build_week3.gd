@@ -119,6 +119,25 @@ func build_level(number: int, tiles: TileSet) -> void:
 	hud.name = "HUD"
 	hud.set("level_number", number)
 	attach(level, hud, level)
+	if number == 2:
+		var region := NavigationRegion2D.new()
+		region.name = "NavigationRegion2D"
+		region.navigation_polygon = load("res://resources/level_2_navigation.tres")
+		attach(level, region, level)
+		var point_a := Marker2D.new()
+		point_a.name = "EnemyPatrolPointA"
+		point_a.position = Vector2(432, 400)
+		attach(level, point_a, level)
+		var point_b := Marker2D.new()
+		point_b.name = "EnemyPatrolPointB"
+		point_b.position = Vector2(656, 224)
+		attach(level, point_b, level)
+		var enemy: CharacterBody2D = load("res://scenes/enemies/enemy.tscn").instantiate()
+		enemy.name = "Enemy"
+		enemy.position = point_a.position
+		enemy.set("patrol_point_a", point_a)
+		enemy.set("patrol_point_b", point_b)
+		attach(level, enemy, level)
 	var packed := PackedScene.new()
 	assert(packed.pack(level) == OK)
 	assert(ResourceSaver.save(packed, "res://scenes/levels/level_%d.tscn" % number) == OK)

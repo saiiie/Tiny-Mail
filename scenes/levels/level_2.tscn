@@ -12,6 +12,9 @@
 
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="10_hud"]
 
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy.tscn" id="11_enemy"]
+[ext_resource type="NavigationPolygon" path="res://resources/level_2_navigation.tres" id="12_navigation"]
+
 [node name="Level2" type="Node2D" unique_id=1133337917]
 texture_filter = 1
 script = ExtResource("1_3p04p")
@@ -90,3 +93,17 @@ texture = ExtResource("9_v8d84")
 
 [node name="HUD" parent="." instance=ExtResource("10_hud")]
 level_number = 2
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = ExtResource("12_navigation")
+
+[node name="EnemyPatrolPointA" type="Marker2D" parent="."]
+position = Vector2(432, 400)
+
+[node name="EnemyPatrolPointB" type="Marker2D" parent="."]
+position = Vector2(656, 224)
+
+[node name="Enemy" parent="." node_paths=PackedStringArray("patrol_point_a", "patrol_point_b") instance=ExtResource("11_enemy")]
+position = Vector2(432, 400)
+patrol_point_a = NodePath("../EnemyPatrolPointA")
+patrol_point_b = NodePath("../EnemyPatrolPointB")
