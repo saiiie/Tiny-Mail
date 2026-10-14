@@ -52,4 +52,6 @@ func run_checks() -> void:
 		current_scene.queue_free()
 		await frames()
 	print("Week 3 integration checks: %d failures" % failures)
+	root.get_node("GameSession").stop_audio()
+	await frames(10)
 	quit(0 if failures == 0 else 1)

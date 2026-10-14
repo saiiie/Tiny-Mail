@@ -65,4 +65,6 @@ func run_checks() -> void:
 		await frames()
 	check(FileAccess.get_file_as_string("res://README.md").contains("## Week 4 - Art, Animation & Particles"), "Week 4 documentation missing")
 	print("Week 4 integration checks: %d failures" % failures)
+	root.get_node("GameSession").stop_audio()
+	await frames(10)
 	quit(0 if failures == 0 else 1)

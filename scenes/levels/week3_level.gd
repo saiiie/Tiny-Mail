@@ -5,6 +5,7 @@ var finished := false
 var resetting := false
 
 func _ready() -> void:
+	GameSession.enter_level()
 	for hazard in $Hazards.get_children():
 		hazard.stepped_in.connect(_on_hazard)
 	$Goal.reached.connect(_on_goal)
@@ -14,18 +15,20 @@ func _on_hazard(_body: Node2D) -> void:
 	if finished or resetting:
 		return
 	resetting = true
+	GameSession.play_hazard()
 	_reset_player.call_deferred()
 
 func _reset_player() -> void:
 	$Player.global_position = $Start.global_position
 	$Player.velocity = Vector2.ZERO
-	$HUD/Status.text = "Splash! Back at START. Take your time and try again."
+	$HUD.set_status("Splash! Back at START. Take your time and try again.")
 	resetting = false
 
 func _on_goal(_body: Node2D) -> void:
 	if finished or resetting:
 		return
 	finished = true
+	GameSession.play_delivery()
 	_finish_delivery.call_deferred()
 
 func _finish_delivery() -> void:
@@ -33,10 +36,11 @@ func _finish_delivery() -> void:
 		var error := get_tree().change_scene_to_file(next_level)
 		if error != OK:
 			finished = false
-			$HUD/Status.text = "Could not load Level 2. Please restart."
+			$HUD.set_status("Could not load Level 2. Please restart.")
 			push_error("Level transition failed: %s" % error)
 	else:
 		$Player.velocity = Vector2.ZERO
 		$Player.set_physics_process(false)
-		$HUD/Status.text = "All mail delivered! You completed Tiny Post. Thank you for playing!"
-		$HUD/Completion.show()
+		GameSession.finish_run()
+		$HUD.set_status("All mail delivered! Thank you for playing.")
+		$HUD.show_completion()

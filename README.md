@@ -51,10 +51,10 @@ Inclusive-design reflection: Clear text labels, forgiving paths, two keyboard mo
 
 #### Test in Godot 4.7.2
 1. Import/open project.godot and let asset imports finish.
-2. Press F6 while viewing either level to test it separately, or F5 to start Level 1.
+2. Press F6 while viewing either level to test it separately, or F5 to open the Main Menu, then choose Start.
 3. Move with WASD or arrow keys; touch each puddle and confirm a reset to START.
 4. Check that hedges and fences block movement. Follow the path to DELIVER HERE; Level 1 should load Level 2 automatically.
-5. Finish Level 2 and confirm the completion message appears and movement stops. Press F8 to stop; F5 starts again.
+5. Finish Level 2 and confirm the completion message appears and movement stops. Press F8 to stop; F5 opens the Main Menu again.
 
 #### Source files and validation
 - scenes/levels/level_1.tscn and level_2.tscn contain the saved layouts, original Player instances, START markers, hazards, goal houses, and HUD.
@@ -95,7 +95,7 @@ MovementDust is a GPUParticles2D at the rabbit's feet: 10 small warm dust partic
 
 ### Testing Week 4
 
-1. Open project.godot in Godot 4.7.2, wait for imports, then press F5 to launch Level 1.
+1. Open project.godot in Godot 4.7.2, wait for imports, then press F5 and choose Start to launch Level 1.
 2. Stand still: confirm the idle sprite and no dust emission.
 3. Walk down (S/down arrow), up (W/up arrow), left (A/left arrow), and right (D/right arrow); confirm the matching two-frame animation for each direction.
 4. Walk along a clear path: confirm dust appears near the feet. Release movement: confirm idle returns and dust clears within 0.3 seconds.
@@ -115,3 +115,77 @@ godot --headless --path . --script tools/validate_week4.gd
 Headless checks verify texture tracks, directional input selection, uninterrupted playback, particle emission flags, idle/completion behavior, and the Week 3 regressions. They do not verify GPU particle appearance or replace interactive visual playtesting.
 
 Week 4 validation results (Godot 4.7.2): all eight GDScript files passed --check-only; resource-path checks found no missing references; both level smoke tests loaded; Week 3 and Week 4 integration suites each reported 0 failures. Headless editor import completed with environment-specific user-directory/feature-profile errors, but no project parser/resource errors. GPU particle appearance and interactive play remain for manual testing.
+
+## Week 5 - UI/UX & Audio
+
+### HUD
+
+Both levels instance scenes/ui/hud.tscn, a reusable CanvasLayer with a viewport-anchored header and container-based layout. It displays Level 1 / 2 or Level 2 / 2, an updating Time: MM:SS value, status text, and controls. The timer starts when gameplay begins, continues through puddles and the Level 1-to-Level 2 transition, and stops at final completion. There is no time limit or time-based penalty. Direct F6 testing of either level also starts the timer.
+
+A small GameSession autoload stores elapsed time and owns the three audio players so time and music persist across scene changes. The Player, animations, particles, collision geometry, and tile layouts are unchanged.
+
+### Main Menu
+
+The startup scene is scenes/ui/main_menu.tscn. Start begins a new run at Level 1 with the timer reset; Quit stops audio and calls get_tree().quit(). Buttons support mouse and keyboard focus (Tab/arrows and Enter/Space).
+
+- R: restart the current level, retaining elapsed run time. From completion, R retries Level 2 and resumes timing.
+- Escape: return to Main Menu; timing stops there.
+- Completion panel: shows Delivery Complete! and final time, with Play Again (new Level 1 run, timer reset) and Main Menu buttons.
+
+### Audio
+
+All audio was generated locally using Python's standard library (math, random, array, wave) and simple synthesized tones/noise, instead of downloaded third-party assets. No samples or existing songs were used. Run python tools/generate_audio.py to reproduce the three original, mono 16-bit PCM WAV files at 22050 Hz; generation is not required to play.
+
+| Asset | Use | Length | Bus |
+|---|---|---|---|
+| assets/audio/music/tiny_post_theme.wav | Gentle original major-key melody; starts in the menu and loops across levels | 12 seconds | Music, -15 dB |
+| assets/audio/sfx/delivery_chime.wav | Three-note chime on either goal, preserved across the level transition | 0.70 seconds | SFX, -5 dB |
+| assets/audio/sfx/puddle_splash.wav | Short synthesized splash at puddle reset | 0.28 seconds | SFX, -5 dB |
+
+The saved default_bus_layout.tres contains Master, Music, and SFX. Music and SFX send to Master. GameSession configures a forward loop across the complete music WAV before playback. Note envelopes and quiet phrase boundaries soften the loop; music is never restarted by level/menu transitions.
+
+### Accessibility
+
+Larger readable text uses Godot's default font: 40px menu title, 22px buttons and primary HUD values, 20px instructions/status, and 32px completion title. Cream text on dark green panels provides high contrast. Visible keyboard focus outlines help identify selected buttons. No fonts or packages were downloaded. Readability and audio balance still need manual review on the target display.
+
+### Peer Playtest
+
+A real 5-minute peer playtest will be conducted after implementation. This requirement and its feedback-based change are NOT complete.
+
+Observation:
+[TO BE FILLED AFTER PLAYTEST]
+
+Change made:
+[TO BE FILLED AFTER PLAYTEST]
+
+Ask a peer to play for five minutes, including starting a run, avoiding/touching puddles, restarting, reading the timer, and finding the menu/completion controls. Record actual observations here, then apply and document one specific change based on that feedback. No observations or feedback-based changes have been invented.
+
+### Manual testing
+
+1. Open project.godot in Godot 4.7.2, allow imports, and press F5. Confirm Main Menu, readable Start/Quit buttons, and music. Let it play for more than 12 seconds to hear the loop.
+2. Choose Start. Confirm Level 1, Time: 00:00 increasing, readable instructions, and uninterrupted music.
+3. Move in four directions; check the existing animations, dust, and hedge collision. Stand still and confirm idle/dust behavior remains correct.
+4. Touch a puddle: confirm reset to START, splash sound, and a timer that keeps counting.
+5. Press R: confirm the current level restarts and elapsed time is retained.
+6. Reach Level 1's goal: hear the delivery chime, confirm Level 2 loads, and check that timer/music continue.
+7. In Level 2, test movement, dust, puddles, and R again. Complete the goal: hear the chime, see the centered completion panel, and confirm the final time stops changing.
+8. Choose Play Again: confirm Level 1 and a reset timer. Press Escape: confirm Main Menu. Start again and verify a fresh timer.
+9. Complete another run and test the completion panel's Main Menu button. Test Tab/Enter navigation and resize the window to check text and panel layout.
+10. Choose Quit: confirm the game closes. Use the Audio dock to inspect Master/Music/SFX if desired; no manual configuration is needed.
+11. Conduct the separate five-minute peer playtest, fill the placeholders, and provide the genuine feedback before marking that activity complete.
+
+### Technical validation
+
+Run from the project directory with Godot on PATH:
+
+```text
+godot --headless --path . --editor --import
+godot --headless --path . --script tools/validate_project.gd
+godot --headless --path . --script tools/validate_week3.gd
+godot --headless --path . --script tools/validate_week4.gd
+godot --headless --path . --script tools/validate_week5.gd
+```
+
+The Week 5 suite exercises menu buttons, R/Escape input events, timer updates/persistence/freeze, header bounds, audio playing states/loop configuration/buses, real hazard/goal overlaps, both completion buttons, and Quit. Headless playback-state tests do not establish audible quality, visual appearance, or peer feedback.
+
+Validation performed with Godot 4.7.2: project-aware validation loaded all 26 script/scene/resource files with zero failures; Week 3, Week 4, and Week 5 integration suites each reported zero failures and clean shutdown. The music playback-state check waited through a full 12-second loop. All referenced paths exist, git diff --check passed, and the Player files, TileSet, and saved tile data remain unchanged. The standalone --check-only command does not initialize autoload names, so validate_project.gd performs the full script/resource check in project context. Headless editor import reports only environment-specific user-directory/feature-profile errors. No interactive visual test, listening assessment, or peer playtest has been performed.

@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scenes/objects/goal.gd" id="8_iwr0g"]
 [ext_resource type="Texture2D" path="res://assets/objects/obj_house.png" id="9_bahl2"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="10_hud"]
+
 [node name="Level1" type="Node2D" unique_id=1738952656]
 texture_filter = 1
 script = ExtResource("1_dga24")
@@ -72,53 +74,5 @@ texture = ExtResource("9_bahl2")
 position = Vector2(496, 496)
 texture = ExtResource("9_bahl2")
 
-[node name="HUD" type="CanvasLayer" parent="." unique_id=444341685]
-
-[node name="Header" type="ColorRect" parent="HUD" unique_id=1685873531]
-offset_right = 960.0
-offset_bottom = 64.0
-mouse_filter = 2
-color = Color(0.14901961, 0.23529412, 0.21960784, 1)
-
-[node name="Title" type="Label" parent="HUD" unique_id=185151292]
-offset_left = 16.0
-offset_top = 4.0
-offset_right = 944.0
-offset_bottom = 27.0
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-text = "TINY POST  |  Level 1 / 2  |  WASD or arrows: move"
-
-[node name="Status" type="Label" parent="HUD" unique_id=562773588]
-offset_left = 16.0
-offset_top = 34.0
-offset_right = 944.0
-offset_bottom = 57.0
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-text = "Follow the path to DELIVER HERE. Avoid puddles; no timer, unlimited retries."
-
-[node name="Completion" type="Panel" parent="HUD" unique_id=166755582]
-visible = false
-offset_left = 200.0
-offset_top = 280.0
-offset_right = 760.0
-offset_bottom = 400.0
-
-[node name="Message" type="Label" parent="HUD/Completion" unique_id=1813278011]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 25.0
-offset_right = 540.0
-offset_bottom = 74.0
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-text = "All mail delivered!
-Both neighborhoods complete. Well done!"
-horizontal_alignment = 1
+[node name="HUD" parent="." instance=ExtResource("10_hud")]
+level_number = 1

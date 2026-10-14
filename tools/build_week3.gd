@@ -115,25 +115,10 @@ func build_level(number: int, tiles: TileSet) -> void:
 		house.texture = load("res://assets/objects/obj_house.png")
 		house.position = pos
 		attach(level, house, level)
-	var hud := CanvasLayer.new()
+	var hud: CanvasLayer = load("res://scenes/ui/hud.tscn").instantiate()
 	hud.name = "HUD"
+	hud.set("level_number", number)
 	attach(level, hud, level)
-	var background := ColorRect.new()
-	background.name = "Header"
-	background.size = Vector2(960,64)
-	background.color = Color("263c38")
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	attach(hud, background, level)
-	label_at(hud, level, "Title", "TINY POST  |  Level %d / 2  |  WASD or arrows: move" % number, Vector2(16,4), 928, 20)
-	label_at(hud, level, "Status", "Follow the path to DELIVER HERE. Avoid puddles; no timer, unlimited retries.", Vector2(16,34), 928, 17)
-	var completion := Panel.new()
-	completion.name = "Completion"
-	completion.position = Vector2(200,280)
-	completion.size = Vector2(560,120)
-	completion.visible = false
-	attach(hud, completion, level)
-	var message := label_at(completion, level, "Message", "All mail delivered!\nBoth neighborhoods complete. Well done!", Vector2(20,25), 520, 24)
-	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var packed := PackedScene.new()
 	assert(packed.pack(level) == OK)
 	assert(ResourceSaver.save(packed, "res://scenes/levels/level_%d.tscn" % number) == OK)
