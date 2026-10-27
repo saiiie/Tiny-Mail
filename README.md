@@ -1,8 +1,32 @@
-# Tiny Post
+# Tiny Mail
 
-Tiny Post is a small top-down 2D game created in Godot for my Game Development weekly activities.
+Tiny Mail is a small top-down 2D game created in Godot for my Game Development weekly activities.
 
 The player controls a rabbit mail carrier who travels through a neighborhood, avoids hazards and enemies, and reaches delivery destinations. The project was developed incrementally across eight weeks, with each activity introducing a new game development concept.
+
+## Screenshots
+
+### Main Menu
+
+![Tiny Mail main menu with Start, Continue, and Quit buttons](docs/screenshots/main-menu.png)
+
+### Level 1
+
+The first delivery route introduces the neighborhood, paths, and puddle hazards.
+
+![Tiny Mail Level 1 showing the rabbit mail carrier and delivery route](docs/screenshots/level-1.png)
+
+### Level 2
+
+The second route adds a more challenging layout and a patrolling crow.
+
+![Tiny Mail Level 2 showing the delivery route, hazards, and crow enemy](docs/screenshots/level-2.png)
+
+### Delivery Complete
+
+The completion screen shows the final time and options to play again or return to the main menu.
+
+![Tiny Mail completion screen with the final time and replay options](docs/screenshots/completion.png)
 
 ## Controls
 
@@ -31,7 +55,7 @@ The player controls a rabbit mail carrier who travels through a neighborhood, av
 
 ## Week 1 - Project Setup
 
-The initial Tiny Post project was created as a simple 2D Godot game.
+The initial Tiny Mail project was created as a simple 2D Godot game.
 
 ### Implemented
 
@@ -155,7 +179,7 @@ The game also provides functionality for restarting gameplay or returning to the
 
 ### Audio
 
-Tiny Post uses separate audio buses for:
+Tiny Mail uses separate audio buses for:
 
 - `Music`
 - `SFX`
@@ -209,7 +233,7 @@ Codex was used as a pair-programming assistant to draft the initial:
 - Patrol/chase transitions.
 - `NavigationAgent2D` movement logic.
 
-The generated implementation was reviewed and adapted to the existing Tiny Post project, including scene references, movement speeds, detection behavior, patrol points, and player-reset behavior.
+The generated implementation was reviewed and adapted to the existing Tiny Mail project, including scene references, movement speeds, detection behavior, patrol points, and player-reset behavior.
 
 ---
 
@@ -229,7 +253,7 @@ These effects provide clearer feedback when the player interacts with hazards, e
 
 ### Save / Load
 
-Tiny Post includes persistent game progress.
+Tiny Mail includes persistent game progress.
 
 The save system stores its data under Godot's `user://` directory so that saved progress persists between sessions.
 
@@ -266,11 +290,11 @@ Godot's Profiler was used to inspect runtime performance.
 
 ## Week 8 - Multi-Platform Export & Team Git
 
-The final activity focuses on preparing Tiny Post for multiple platforms and practicing collaborative Git workflows.
+The final activity focuses on preparing Tiny Mail for multiple platforms and practicing collaborative Git workflows.
 
 ### Target Platforms
 
-Tiny Post is configured for:
+Tiny Mail is configured for:
 
 - Windows Desktop
 - Web
@@ -291,7 +315,7 @@ The Web version uses browser-friendly window/stretch behavior so that the game a
 
 ### Team Git Practice
 
-Although Tiny Post is an individual project, the Week 8 activity includes a simulated collaborative Git workflow to practice techniques that would normally be used in a team repository.
+Although Tiny Mail is an individual project, the Week 8 activity includes a simulated collaborative Git workflow to practice techniques that would normally be used in a team repository.
 
 The exercise includes:
 - Creating a feature branch.
